@@ -1,6 +1,8 @@
 import { Router } from "express";
 import { healthCheck } from "../controllers/healthController";
 import authRoutes from "./auth.routes";
+import categoryRoutes from "./category.routes";
+import transactionRoutes from "./transaction.routes";
 
 const router = Router();
 
@@ -15,5 +17,7 @@ const router = Router();
  */
 router.get("/health", healthCheck);
 router.use("/auth", authRoutes);
+router.use("/categories", categoryRoutes);
+router.use("/transactions", transactionRoutes);
 
 export default router;
