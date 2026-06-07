@@ -1,5 +1,6 @@
 import { Router } from "express";
 import { healthCheck } from "../controllers/healthController";
+import authRoutes from "./auth.routes";
 
 const router = Router();
 
@@ -13,5 +14,6 @@ const router = Router();
  *         description: Returns OK status
  */
 router.get("/health", healthCheck);
+router.use("/auth", authRoutes);
 
 export default router;
