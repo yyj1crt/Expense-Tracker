@@ -1,27 +1,44 @@
-import { BrowserRouter, Route, Routes, Navigate } from "react-router-dom";
-import Sidebar from "./components/Sidebar";
-import Dashboard from "./pages/Dashboard";
-import Expenses from "./pages/Expenses";
-import Settings from "./pages/Settings";
-import Login from "./pages/Login";
+import { BrowserRouter, Navigate, Route, Routes } from "react-router-dom";
+import AppLayout from "./components/layout/AppLayout";
+import LoginPage from "./pages/LoginPage";
+import RegisterPage from "./pages/RegisterPage";
+import DashboardPage from "./pages/DashboardPage";
+import TransactionsPage from "./pages/TransactionsPage";
+import CategoriesPage from "./pages/CategoriesPage";
 
 function App() {
   return (
     <BrowserRouter>
-      <div className="min-h-screen bg-brand-900 text-slate-100">
-        <div className="flex min-h-screen">
-          <Sidebar />
-          <main className="flex-1 bg-white text-slate-900 p-8">
-            <Routes>
-              <Route path="/" element={<Navigate to="/dashboard" replace />} />
-              <Route path="/dashboard" element={<Dashboard />} />
-              <Route path="/expenses" element={<Expenses />} />
-              <Route path="/settings" element={<Settings />} />
-              <Route path="/login" element={<Login />} />
-            </Routes>
-          </main>
-        </div>
-      </div>
+      <Routes>
+        <Route path="/" element={<Navigate to="/dashboard" replace />} />
+        <Route path="/login" element={<LoginPage />} />
+        <Route path="/register" element={<RegisterPage />} />
+        <Route
+          path="/dashboard"
+          element={
+            <AppLayout>
+              <DashboardPage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/transactions"
+          element={
+            <AppLayout>
+              <TransactionsPage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/categories"
+          element={
+            <AppLayout allowedRoles={["admin"]}>
+              <CategoriesPage />
+            </AppLayout>
+          }
+        />
+        <Route path="*" element={<Navigate to="/dashboard" replace />} />
+      </Routes>
     </BrowserRouter>
   );
 }
