@@ -7,22 +7,45 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String    @id @default(uuid())
-  email     String    @unique
-  password  String
-  name      String?
-  expenses  Expense[]
-  createdAt DateTime  @default(now())
+enum Role {
+  USER
+  ADMIN
 }
 
-model Expense {
-  id        String   @id @default(uuid())
-  title     String
-  amount    Float
-  category  String
-  date      DateTime @default(now())
-  user      User     @relation(fields: [userId], references: [id])
-  userId    String
-  createdAt DateTime @default(now())
+enum TransactionType {
+  INCOME
+  EXPENSE
+}
+
+model User {
+  id           Int           @id @default(autoincrement())
+  email        String        @unique
+  password     String
+  name         String
+  role         Role          @default(USER)
+  transactions Transaction[]
+  createdAt    DateTime      @default(now())
+}
+
+model Category {
+  id           Int           @id @default(autoincrement())
+  name         String        @unique
+  color        String
+  icon         String
+  transactions Transaction[]
+}
+
+model Transaction {
+  id         Int             @id @default(autoincrement())
+  title      String
+  amount     Float
+  type       TransactionType
+  date       DateTime
+  note       String?
+  user       User            @relation(fields: [userId], references: [id])
+  userId     Int
+  category   Category        @relation(fields: [categoryId], references: [id])
+  categoryId Int
+  createdAt  DateTime        @default(now())
+  updatedAt  DateTime        @updatedAt
 }
