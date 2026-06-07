@@ -42,6 +42,7 @@ export interface TransactionSummary {
   balance: number;
   byCategory: CategoryBreakdown[];
   monthlyTotals: MonthlyTotal[];
+  recentTransactions?: Transaction[];
 }
 
 export interface ApiResponse<T> {
