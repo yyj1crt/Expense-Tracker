@@ -7,16 +7,24 @@ import swaggerUi from "swagger-ui-express";
 import dotenv from "dotenv";
 import apiRouter from "./routes/api";
 import { errorHandler } from "./middleware/errorHandler";
+import { sanitiseRequest } from "./middleware/sanitise.middleware";
 
 dotenv.config();
 
 const app = express();
 
-const limiter = rateLimit({
+const FRONTEND_URL = process.env.FRONTEND_URL;
+if (!FRONTEND_URL) {
+  throw new Error("FRONTEND_URL must be set in environment variables");
+}
+
+// General rate limiting to reduce brute force and denial of service risks (OWASP A6/A7).
+const generalLimiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 120,
+  max: 100,
   standardHeaders: true,
   legacyHeaders: false,
+  message: { error: "Too many requests, please try again later." },
 });
 
 const swaggerOptions = {
@@ -43,12 +51,49 @@ const swaggerOptions = {
 
 const swaggerSpec = swaggerJsdoc(swaggerOptions);
 
-app.use(helmet());
-app.use(cors());
+// Helmet hardening: content security policy, HSTS, no-sniff, frameguard, and XSS protections.
+app.use(
+  helmet({
+    contentSecurityPolicy: {
+      useDefaults: true,
+      directives: {
+        "default-src": ["'self'"],
+        "script-src": ["'self'"],
+        "style-src": ["'self'", "'unsafe-inline'"],
+        "img-src": ["'self'", "data:"],
+        "connect-src": ["'self'", FRONTEND_URL],
+        "font-src": ["'self'", "data:"],
+        "object-src": ["'none'"],
+        "frame-ancestors": ["'none'"],
+      },
+    },
+    hsts: {
+      maxAge: 31536000,
+      includeSubDomains: true,
+      preload: true,
+    },
+    noSniff: true,
+    frameguard: { action: "deny" },
+  })
+);
+
+// Apply additional XSS filtering when available.
+app.use((helmet as any).xssFilter ? (helmet as any).xssFilter() : (_req, _res, next) => next());
+
+// CORS is locked to the frontend origin and only allows safe headers and methods.
+app.use(
+  cors({
+    origin: FRONTEND_URL,
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+  })
+);
 app.use(express.json());
-app.use(limiter);
+
+// Input sanitisation removes HTML tags and trims strings in body, params, and query values.
+app.use(sanitiseRequest);
 app.use("/api/docs", swaggerUi.serve, swaggerUi.setup(swaggerSpec));
-app.use("/api", apiRouter);
+app.use("/api", generalLimiter, apiRouter);
 
 app.get("/", (_req, res) => {
   res.json({ status: "ok", timestamp: new Date().toISOString() });

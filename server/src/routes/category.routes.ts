@@ -8,7 +8,7 @@ import {
 } from "../controllers/category.controller";
 import { verifyToken } from "../middleware/auth.middleware";
 import { requireRole } from "../middleware/role.middleware";
-import { validateRequest } from "../middleware/validateRequest";
+import { validateRequest } from "../middleware/validate.middleware";
 
 const router = Router();
 

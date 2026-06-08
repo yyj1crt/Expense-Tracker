@@ -3,12 +3,14 @@ import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";
 import { PrismaClient } from "@prisma/client";
 import { AuthRequest, LoginBody, RegisterBody } from "../types";
+import { sanitiseUser } from "../utils/sanitiseUser";
 
 const prisma = new PrismaClient();
 const JWT_SECRET = process.env.JWT_SECRET;
+const BCRYPT_SALT_ROUNDS = 12;
 
-if (!JWT_SECRET) {
-  throw new Error("JWT_SECRET must be set in environment variables");
+if (!JWT_SECRET || JWT_SECRET.length < 32) {
+  throw new Error("JWT_SECRET must be configured and at least 32 characters long");
 }
 
 const signToken = (payload: { id: number; email: string; role: string }) =>
@@ -20,10 +22,10 @@ export const register = async (req: AuthRequest, res: Response, next: NextFuncti
 
     const existingUser = await prisma.user.findUnique({ where: { email } });
     if (existingUser) {
-      return res.status(409).json({ error: "Email is already registered" });
+      return res.status(400).json({ error: "Unable to complete registration" });
     }
 
-    const hashedPassword = await bcrypt.hash(password, 12);
+    const hashedPassword = await bcrypt.hash(password, BCRYPT_SALT_ROUNDS);
     const user = await prisma.user.create({
       data: {
         email,
@@ -35,13 +37,7 @@ export const register = async (req: AuthRequest, res: Response, next: NextFuncti
     const token = signToken({ id: user.id, email: user.email, role: user.role });
     return res.status(201).json({
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        createdAt: user.createdAt,
-      },
+      user: sanitiseUser(user),
     });
   } catch (error) {
     next(error);
@@ -65,13 +61,7 @@ export const login = async (req: AuthRequest, res: Response, next: NextFunction)
     const token = signToken({ id: user.id, email: user.email, role: user.role });
     return res.json({
       token,
-      user: {
-        id: user.id,
-        email: user.email,
-        name: user.name,
-        role: user.role,
-        createdAt: user.createdAt,
-      },
+      user: sanitiseUser(user),
     });
   } catch (error) {
     next(error);

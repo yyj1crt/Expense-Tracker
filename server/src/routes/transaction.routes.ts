@@ -9,7 +9,7 @@ import {
   getSummary,
 } from "../controllers/transaction.controller";
 import { verifyToken } from "../middleware/auth.middleware";
-import { validateRequest } from "../middleware/validateRequest";
+import { validateRequest } from "../middleware/validate.middleware";
 
 const router = Router();
 

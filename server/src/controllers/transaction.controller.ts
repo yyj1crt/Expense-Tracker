@@ -4,6 +4,7 @@ import { AuthRequest } from "../types";
 
 const prisma = new PrismaClient();
 
+// Prisma ORM uses parameterized queries by default, protecting against SQL injection by avoiding string interpolation in SQL statements.
 const getDateRange = () => {
   const now = new Date();
   const start = new Date(now.getFullYear(), now.getMonth() - 5, 1);
@@ -89,6 +90,7 @@ export const getTransactionById = async (req: AuthRequest, res: Response, next: 
       include: { category: true },
     });
     if (!transaction || transaction.userId !== userId) {
+      // Prevent broken access control by ensuring the authenticated user is the owner of the transaction.
       return res.status(404).json({ error: "Transaction not found" });
     }
     return res.json({ transaction });
@@ -152,6 +154,7 @@ export const updateTransaction = async (req: AuthRequest, res: Response, next: N
 
     const transaction = await prisma.transaction.findUnique({ where: { id: transactionId } });
     if (!transaction || transaction.userId !== userId) {
+      // Ensure only the owner can update their own transaction record.
       return res.status(404).json({ error: "Transaction not found" });
     }
 
@@ -186,6 +189,7 @@ export const deleteTransaction = async (req: AuthRequest, res: Response, next: N
 
     const transaction = await prisma.transaction.findUnique({ where: { id: transactionId } });
     if (!transaction || transaction.userId !== userId) {
+      // Ensure delete actions are only allowed for the transaction owner.
       return res.status(404).json({ error: "Transaction not found" });
     }
 
