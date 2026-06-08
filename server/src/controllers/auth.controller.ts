@@ -1,3 +1,4 @@
+// feat: authentication controller with JWT issuance and secure user sanitisation
 import { Response, NextFunction } from "express";
 import bcrypt from "bcryptjs";
 import jwt from "jsonwebtoken";

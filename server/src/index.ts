@@ -1,3 +1,4 @@
+// chore: start server application
 import { app } from "./app";
 import { logger } from "./utils/logger";
 

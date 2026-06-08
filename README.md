@@ -1,90 +1,167 @@
 # Expense Tracker Monorepo
 
-This repository contains a full-stack Expense Tracker with a Node.js/Express backend and a React + Vite frontend.
+A full-stack expense tracking application with a TypeScript Express backend and a React + Vite frontend.
 
-## Structure
+## Overview
 
-- `server/` — Express backend with TypeScript and Prisma ORM
-- `client/` — React + Vite frontend with Tailwind CSS
+This project allows users to register, log in, and manage income and expense transactions. The backend exposes secure REST API endpoints, while the frontend provides a polished analytics dashboard, transaction management UI, and admin category controls.
 
-## Server setup
+## Screenshots
 
-1. Open `server/`:
-   ```bash
-   cd server
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Copy environment variables:
-   ```bash
-   cp .env.example .env
-   ```
-4. Update `.env` with your PostgreSQL connection string and `JWT_SECRET`.
-5. Generate Prisma client and push schema:
-   ```bash
-   npx prisma generate
-   npx prisma db push
-   ```
-6. Run the backend in development:
-   ```bash
-   npm run dev
-   ```
+> Add screenshots here once available.
 
-## Client setup
+## Prerequisites
 
-1. Open `client/`:
-   ```bash
-   cd client
-   ```
-2. Install dependencies:
-   ```bash
-   npm install
-   ```
-3. Start the frontend:
-   ```bash
-   npm run dev
-   ```
+- Node.js 18 or newer
+- PostgreSQL
+- Git
 
-## Environment variables
+## Setup
 
-The backend uses the following variables in `server/.env.example`:
+### Backend
 
-- `DATABASE_URL`
-- `JWT_SECRET`
-- `PORT`
-- `NODE_ENV`
+```bash
+cd server
+npm install
+cp .env.example .env
+```
 
-The client can use `VITE_API_BASE_URL` to override the API base URL.
+Update `server/.env` with your PostgreSQL credentials and a strong JWT secret.
+
+Run Prisma migrations and seed data:
+
+```bash
+npm run db:migrate
+npm run db:seed
+```
+
+Start the backend in development:
+
+```bash
+npm run dev
+```
+
+### Frontend
+
+```bash
+cd client
+npm install
+npm run dev
+```
+
+The frontend will run at `http://localhost:5173` by default.
+
+## Available Scripts
+
+### Server scripts (`server/package.json`)
+
+- `npm run dev` — start backend with `nodemon` and `ts-node`
+- `npm run build` — compile TypeScript
+- `npm run start` — run the compiled server from `dist`
+- `npm run test` — run Jest tests
+- `npm run test:coverage` — run Jest with coverage
+- `npm run db:migrate` — apply Prisma migrations
+- `npm run db:seed` — run database seed script
+- `npm run db:studio` — launch Prisma Studio
+
+### Client scripts (`client/package.json`)
+
+- `npm run dev` — run Vite development server
+- `npm run build` — build production assets
+- `npm run preview` — preview built app
+- `npm run test` — run Vitest unit and integration tests
+- `npm run test:coverage` — run Vitest with coverage
+- `npm run e2e` — run Playwright end-to-end tests
+
+## API Documentation
+
+Swagger UI is available at:
+
+- `http://localhost:4000/api/docs`
+
+It documents all API endpoints, request schemas, and response schemas.
 
 ## Testing
 
 ### Server
 
-Run TypeScript type-checking and build:
 ```bash
 cd server
-npm run typecheck
-npm run build
+npm run test
+npm run test:coverage
 ```
 
 ### Client
 
-Unit and integration tests:
 ```bash
 cd client
 npm run test
 ```
 
-End-to-end tests with Playwright:
+### End-to-end
+
 ```bash
 cd client
-npm run e2e
+npm run test:e2e
 ```
 
-## Notes
+## Project Structure
 
-- The server is configured with `helmet`, `cors`, request rate limiting, and Swagger docs at `/api-docs`.
-- The client uses Tailwind CSS with a professional dark sidebar and white content layout.
-- Prisma schema is configured for `User` and `Expense` models.
+```
+expense-tracker-website/
+├── client/
+│   ├── public/
+│   ├── src/
+│   │   ├── components/
+│   │   ├── context/
+│   │   ├── hooks/
+│   │   ├── pages/
+│   │   ├── services/
+│   │   ├── types/
+│   │   └── utils/
+│   ├── package.json
+│   └── vite.config.ts
+├── server/
+│   ├── prisma/
+│   ├── src/
+│   │   ├── controllers/
+│   │   ├── middleware/
+│   │   ├── routes/
+│   │   ├── types/
+│   │   └── utils/
+│   ├── package.json
+│   └── tsconfig.json
+└── README.md
+```
+
+## Tech Stack
+
+| Layer | Technology |
+| --- | --- |
+| Frontend | React, TypeScript, Vite, Tailwind CSS |
+| Backend | Node.js, Express, TypeScript, Prisma, PostgreSQL |
+| Auth | JWT, bcrypt |
+| Testing | Jest, Vitest, React Testing Library, Playwright |
+| Docs | Swagger UI |
+
+## Security Features
+
+- Helmet hardening with CSP, HSTS, noSniff, frameguard, and XSS filtering
+- CORS restricted to configured frontend origin
+- Rate limiting on all API routes and auth endpoints
+- Input sanitisation for `body`, `params`, and `query`
+- Strong JWT token policy with 7-day expiration
+- Password hashing using bcrypt with 12 salt rounds
+- Role-based access control for admin-only category management
+- Ownership enforcement for user transactions
+- Prisma ORM parameterized queries for SQL injection protection
+
+## Git Commit Convention
+
+This project follows conventional commit messages such as:
+
+- `feat: add user authentication`
+- `fix: resolve transaction ownership bug`
+- `chore: update dependencies`
+- `docs: improve README`
+

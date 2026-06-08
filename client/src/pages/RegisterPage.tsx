@@ -22,7 +22,8 @@ const registerSchema = z
 
 type RegisterFormValues = z.infer<typeof registerSchema>;
 
-const RegisterPage = () => {
+// feat: registration page with password confirmation and validation
+const RegisterPage = (): JSX.Element => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
   const navigate = useNavigate();
@@ -36,7 +37,7 @@ const RegisterPage = () => {
     mode: "onTouched",
   });
 
-  const onSubmit = async (values: RegisterFormValues) => {
+  const onSubmit = async (values: RegisterFormValues): Promise<void> => {
     setServerError(null);
     setSuccessMessage(null);
 
@@ -55,8 +56,8 @@ const RegisterPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-md rounded-[36px] border border-white/10 bg-slate-950/95 p-8 shadow-soft backdrop-blur-lg">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-md rounded-[36px] border border-white/10 bg-slate-950/95 p-8 shadow-soft backdrop-blur-lg">
         <div className="mb-8 text-center">
           <p className="text-sm uppercase tracking-[0.4em] text-indigo-300/80">SpendWise</p>
           <h1 className="mt-4 text-3xl font-semibold text-white">Create your account</h1>
@@ -141,8 +142,8 @@ const RegisterPage = () => {
             Sign in
           </Link>
         </p>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

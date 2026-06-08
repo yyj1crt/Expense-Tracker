@@ -1,3 +1,4 @@
+// feat: accessible toast notification component for UX feedback
 import { useEffect } from "react";
 
 export interface ToastProps {
@@ -7,7 +8,7 @@ export interface ToastProps {
   onDismiss: () => void;
 }
 
-const Toast = ({ message, variant, onDismiss }: ToastProps) => {
+const Toast = ({ message, variant, onDismiss }: ToastProps): JSX.Element => {
   useEffect(() => {
     const timer = window.setTimeout(onDismiss, 3000);
     return () => window.clearTimeout(timer);

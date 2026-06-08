@@ -1,4 +1,5 @@
-import express from "express";
+// feat: configure secure HTTP middleware and API routing
+import express, { type RequestHandler } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
@@ -78,7 +79,8 @@ app.use(
 );
 
 // Apply additional XSS filtering when available.
-app.use((helmet as any).xssFilter ? (helmet as any).xssFilter() : (_req, _res, next) => next());
+const helmetModule = helmet as unknown as { xssFilter?: () => RequestHandler };
+app.use(helmetModule.xssFilter ? helmetModule.xssFilter() : (_req, _res, next) => next());
 
 // CORS is locked to the frontend origin and only allows safe headers and methods.
 app.use(

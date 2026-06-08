@@ -1,3 +1,4 @@
+// feat: enforce authentication and optional role-based access control in layout
 import type { ReactNode } from "react";
 import { Navigate } from "react-router-dom";
 import Sidebar from "./Sidebar";
@@ -8,7 +9,7 @@ interface AppLayoutProps {
   allowedRoles?: string[];
 }
 
-const AppLayout = ({ children, allowedRoles }: AppLayoutProps) => {
+const AppLayout = ({ children, allowedRoles }: AppLayoutProps): JSX.Element => {
   const { isAuthenticated, isLoading, user } = useAuth();
 
   if (isLoading) {

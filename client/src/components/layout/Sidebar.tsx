@@ -1,3 +1,4 @@
+// feat: sidebar navigation with role-aware menu items
 import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
@@ -7,7 +8,7 @@ const navItems = [
   { href: "/categories", label: "Categories", roles: ["admin"] },
 ];
 
-const Sidebar = () => {
+const Sidebar = (): JSX.Element => {
   const { user, logout } = useAuth();
   const displayName = user?.name ?? "Guest";
   const role = user?.role ?? "visitor";

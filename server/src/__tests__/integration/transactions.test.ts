@@ -32,7 +32,7 @@ jest.mock("@prisma/client", () => {
 import { app } from "../../app";
 import { PrismaClient } from "@prisma/client";
 
-const mockedPrisma = (PrismaClient as jest.Mock).mock.results[0].value as any;
+const mockedPrisma = (PrismaClient as unknown as jest.MockedClass<typeof PrismaClient>).mock.results[0].value;
 
 beforeAll(() => {
   process.env.JWT_SECRET = "test-secret";

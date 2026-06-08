@@ -1,5 +1,5 @@
 declare module "swagger-jsdoc" {
-  const swaggerJsdoc: any;
+  const swaggerJsdoc: (options: object) => object;
   export default swaggerJsdoc;
 }
 
@@ -7,7 +7,7 @@ declare module "swagger-ui-express" {
   import { RequestHandler } from "express";
   const swaggerUi: {
     serve: RequestHandler[];
-    setup: (swaggerDoc: any, options?: any) => RequestHandler;
+    setup: (swaggerDoc: object, options?: object) => RequestHandler;
   };
   export default swaggerUi;
 }

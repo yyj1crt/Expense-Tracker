@@ -1,3 +1,4 @@
+// chore: centralize express-validator validation result handling
 import { Request, Response, NextFunction } from "express";
 import { validationResult } from "express-validator";
 

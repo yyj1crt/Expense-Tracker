@@ -1,3 +1,4 @@
+// feat: dashboard analytics page with charts and key summary cards
 import { Link } from "react-router-dom";
 import {
   Bar,
@@ -77,22 +78,39 @@ const renderCardGradient = (key: string) => {
   return "from-slate-200/50 via-transparent to-slate-100/0";
 };
 
-const dashboardTooltip = ({ active, payload, label }: any) => {
+interface ChartPayloadItem {
+  name?: string;
+  value?: number;
+  payload?: { percentage?: number };
+}
+
+interface DashboardTooltipProps {
+  active?: boolean;
+  payload?: ChartPayloadItem[];
+  label?: string;
+}
+
+const dashboardTooltip = ({ active, payload, label }: DashboardTooltipProps): JSX.Element | null => {
   if (!active || !payload || payload.length === 0) return null;
 
   return (
     <div className="rounded-3xl border border-slate-200 bg-white p-4 text-sm shadow-soft">
       <p className="font-semibold text-slate-900">{label}</p>
-      {payload.map((entry: any) => (
+      {payload.map((entry) => (
         <p key={entry.name} className="mt-2 text-slate-600">
-          <span className="font-semibold text-slate-900">{entry.name}</span>: {entry.value.toLocaleString("en-US", { style: "currency", currency: "USD" })}
+          <span className="font-semibold text-slate-900">{entry.name}</span>: {entry.value?.toLocaleString("en-US", { style: "currency", currency: "USD" })}
         </p>
       ))}
     </div>
   );
 };
 
-const donutTooltip = ({ active, payload }: any) => {
+interface DonutTooltipProps {
+  active?: boolean;
+  payload?: ChartPayloadItem[];
+}
+
+const donutTooltip = ({ active, payload }: DonutTooltipProps): JSX.Element | null => {
   if (!active || !payload || payload.length === 0) return null;
 
   const entry = payload[0];
@@ -122,7 +140,7 @@ const getStatusText = (balance: number) => {
   return { label: "Negative", color: "text-rose-500" };
 };
 
-const DashboardPage = () => {
+const DashboardPage = (): JSX.Element => {
   const { data, isLoading, error, refetch } = useSummary();
 
   const totals = data?.monthlyTotals ?? [];

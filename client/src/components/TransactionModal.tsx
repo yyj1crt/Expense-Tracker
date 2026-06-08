@@ -1,3 +1,4 @@
+// feat: transaction modal with validation, edit/create support, and secure form handling
 import { useEffect } from "react";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -25,7 +26,7 @@ interface TransactionModalProps {
   onError: (message: string) => void;
 }
 
-const TransactionModal = ({ categories, isLoadingCategories, transaction, onClose, onSuccess, onError }: TransactionModalProps) => {
+const TransactionModal = ({ categories, isLoadingCategories, transaction, onClose, onSuccess, onError }: TransactionModalProps): JSX.Element => {
   const {
     register,
     handleSubmit,

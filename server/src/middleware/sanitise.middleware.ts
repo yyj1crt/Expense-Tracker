@@ -1,8 +1,9 @@
+// feat: sanitize all request payloads to reduce XSS and injection risk
 import { NextFunction, Request, Response } from "express";
 
-const stripHtml = (value: string) => value.replace(/<[^>]*>/g, "").trim();
+const stripHtml = (value: string): string => value.replace(/<[^>]*>/g, "").trim();
 
-const sanitiseValue = (value: any): any => {
+const sanitiseValue = (value: unknown): unknown => {
   if (typeof value === "string") {
     return stripHtml(value);
   }
@@ -12,13 +13,13 @@ const sanitiseValue = (value: any): any => {
   }
 
   if (value && typeof value === "object") {
-    return sanitiseObject(value);
+    return sanitiseObject(value as Record<string, unknown>);
   }
 
   return value;
 };
 
-const sanitiseObject = (input: Record<string, unknown>) => {
+const sanitiseObject = (input: Record<string, unknown>): Record<string, unknown> => {
   return Object.keys(input).reduce<Record<string, unknown>>((sanitised, key) => {
     sanitised[key] = sanitiseValue(input[key]);
     return sanitised;

@@ -1,3 +1,4 @@
+// chore: register API route groups and health check
 import { Router } from "express";
 import { healthCheck } from "../controllers/healthController";
 import authRoutes from "./auth.routes";

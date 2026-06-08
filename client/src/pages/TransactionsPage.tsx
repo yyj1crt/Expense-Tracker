@@ -20,7 +20,8 @@ const sortLabel = (field: "date" | "amount", sortBy: string, sortOrder: string) 
   return sortOrder === "asc" ? "ascending" : "descending";
 };
 
-const TransactionsPage = () => {
+// feat: transaction management page with filtering, sorting, and modal CRUD
+const TransactionsPage = (): JSX.Element => {
   const {
     transactions,
     total,

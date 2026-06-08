@@ -2,7 +2,13 @@ import { useCallback, useEffect, useState } from "react";
 import api from "../services/api";
 import type { ApiResponse, TransactionSummary } from "../types";
 
-export const useSummary = () => {
+// feat: summary hook for dashboard analytics and live refresh
+export const useSummary = (): {
+  data: TransactionSummary | null;
+  isLoading: boolean;
+  error: string | null;
+  refetch: () => Promise<void>;
+} => {
   const [data, setData] = useState<TransactionSummary | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

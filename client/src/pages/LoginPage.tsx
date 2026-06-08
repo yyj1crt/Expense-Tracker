@@ -14,7 +14,8 @@ const loginSchema = z.object({
 
 type LoginFormValues = z.infer<typeof loginSchema>;
 
-const LoginPage = () => {
+// feat: login page with validation and secure error messaging
+const LoginPage = (): JSX.Element => {
   const [serverError, setServerError] = useState<string | null>(null);
   const { login } = useAuth();
   const navigate = useNavigate();
@@ -28,7 +29,7 @@ const LoginPage = () => {
     mode: "onTouched",
   });
 
-  const onSubmit = async (values: LoginFormValues) => {
+  const onSubmit = async (values: LoginFormValues): Promise<void> => {
     setServerError(null);
 
     try {
@@ -47,8 +48,8 @@ const LoginPage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-16 sm:px-6 lg:px-8">
-      <div className="mx-auto w-full max-w-md rounded-[36px] border border-white/10 bg-slate-950/95 p-8 shadow-soft backdrop-blur-lg">
+    <main className="min-h-screen bg-gradient-to-br from-slate-950 via-slate-900 to-slate-800 px-4 py-16 sm:px-6 lg:px-8">
+      <section className="mx-auto w-full max-w-md rounded-[36px] border border-white/10 bg-slate-950/95 p-8 shadow-soft backdrop-blur-lg">
         <div className="mb-8 text-center">
           <p className="text-sm uppercase tracking-[0.4em] text-indigo-300/80">SpendWise</p>
           <h1 className="mt-4 text-3xl font-semibold text-white">Welcome back</h1>
@@ -106,8 +107,8 @@ const LoginPage = () => {
             Create an account
           </Link>
         </p>
-      </div>
-    </div>
+      </section>
+    </main>
   );
 };
 

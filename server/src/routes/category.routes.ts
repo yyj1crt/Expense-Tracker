@@ -1,3 +1,4 @@
+// feat: category routes restricted to admin users
 import { Router } from "express";
 import { body, param } from "express-validator";
 import {

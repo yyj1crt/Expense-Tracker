@@ -1,5 +1,6 @@
+// feat: transaction controller with ownership enforcement and SQL injection protection
 import { NextFunction, Request, Response } from "express";
-import { PrismaClient } from "@prisma/client";
+import { PrismaClient, Prisma } from "@prisma/client";
 import { AuthRequest } from "../types";
 
 const prisma = new PrismaClient();
@@ -27,7 +28,7 @@ export const getAllTransactions = async (req: AuthRequest, res: Response, next: 
       limit = "20",
     } = req.query as Record<string, string>;
 
-    const where: any = { userId };
+    const where: Prisma.TransactionWhereInput = { userId };
 
     if (type && ["INCOME", "EXPENSE"].includes(type)) {
       where.type = type;
