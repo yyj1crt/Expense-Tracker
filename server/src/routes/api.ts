@@ -4,6 +4,7 @@ import { healthCheck } from "../controllers/healthController";
 import authRoutes from "./auth.routes";
 import categoryRoutes from "./category.routes";
 import transactionRoutes from "./transaction.routes";
+import adminRoutes from "./admin.routes";
 
 const router = Router();
 
@@ -20,5 +21,6 @@ router.get("/health", healthCheck);
 router.use("/auth", authRoutes);
 router.use("/categories", categoryRoutes);
 router.use("/transactions", transactionRoutes);
+router.use("/admin", adminRoutes);
 
 export default router;

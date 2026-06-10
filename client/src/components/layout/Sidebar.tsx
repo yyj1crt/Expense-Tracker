@@ -1,14 +1,19 @@
 // feat: sidebar navigation with role-aware menu items
 import { NavLink } from "react-router-dom";
-import { LayoutDashboard, ArrowLeftRight, Tag, LogOut, User, Wallet, PiggyBank, BarChart3 } from "lucide-react";
+import { LayoutDashboard, ArrowLeftRight, Tag, LogOut, Wallet, PiggyBank, BarChart3, Users, Shield } from "lucide-react";
 import { useAuth } from "../../context/AuthContext";
 
-const navItems = [
+const userNavItems = [
   { href: "/dashboard", label: "Dashboard", icon: LayoutDashboard, key: "dashboard" },
   { href: "/transactions", label: "Transactions", icon: ArrowLeftRight, key: "transactions" },
   { href: "/budget", label: "Budget Planner", icon: PiggyBank, key: "budget" },
   { href: "/reports", label: "Reports", icon: BarChart3, key: "reports" },
-  { href: "/categories", label: "Categories", icon: Tag, key: "categories", adminOnly: true },
+];
+
+const adminNavItems = [
+  { href: "/admin/dashboard", label: "Admin Dashboard", icon: Shield, key: "admin-dashboard" },
+  { href: "/admin/users", label: "User Management", icon: Users, key: "admin-users" },
+  { href: "/categories", label: "Categories", icon: Tag, key: "categories" },
 ];
 
 const Sidebar = (): JSX.Element => {
@@ -30,29 +35,27 @@ const Sidebar = (): JSX.Element => {
         </div>
 
         <nav aria-label="Primary" className="space-y-2">
-          {navItems
-            .filter((item) => (item.adminOnly ? user?.role === "ADMIN" : true))
-            .map((item) => {
-              const IconComponent = item.icon;
-              return (
-                <NavLink
-                  key={item.href}
-                  to={item.href}
-                  className={({ isActive }) =>
-                    `flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold transition-all duration-200 ${
-                      isActive
-                        ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
-                        : "text-slate-200 hover:bg-slate-800 hover:text-white"
-                    }`
-                  }
-                >
-                  <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-indigo-300 transition-all duration-200 group-hover:bg-indigo-500/20">
-                    <IconComponent className="h-5 w-5" />
-                  </span>
-                  {item.label}
-                </NavLink>
-              );
-            })}
+          {(user?.role === "ADMIN" ? adminNavItems : userNavItems).map((item) => {
+            const IconComponent = item.icon;
+            return (
+              <NavLink
+                key={item.href}
+                to={item.href}
+                className={({ isActive }) =>
+                  `flex items-center gap-4 rounded-2xl px-5 py-4 text-sm font-semibold transition-all duration-200 ${
+                    isActive
+                      ? "bg-indigo-600 text-white shadow-lg shadow-indigo-500/20"
+                      : "text-slate-200 hover:bg-slate-800 hover:text-white"
+                  }`
+                }
+              >
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white/5 text-indigo-300 transition-all duration-200 group-hover:bg-indigo-500/20">
+                  <IconComponent className="h-5 w-5" />
+                </span>
+                {item.label}
+              </NavLink>
+            );
+          })}
         </nav>
       </div>
 

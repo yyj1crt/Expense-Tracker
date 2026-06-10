@@ -12,9 +12,21 @@ async function main() {
     { name: "Salary", color: "#10b981", icon: "💰" },
   ];
 
-  await prisma.category.createMany({ data: categories });
+  await prisma.category.createMany({ data: categories, skipDuplicates: true });
 
   const hashedPassword = await bcrypt.hash("Demo1234!", 10);
+  const adminPassword = await bcrypt.hash(process.env.ADMIN_PASSWORD || "Admin@2026!", 10);
+
+  const adminUser = await prisma.user.upsert({
+    where: { email: process.env.ADMIN_EMAIL || "admin@spendwise.local" },
+    update: { password: adminPassword, name: "System Administrator", role: "ADMIN" },
+    create: {
+      email: process.env.ADMIN_EMAIL || "admin@spendwise.local",
+      password: adminPassword,
+      name: "System Administrator",
+      role: "ADMIN",
+    },
+  });
 
   const user = await prisma.user.upsert({
     where: { email: "demo@example.com" },

@@ -12,6 +12,7 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import { useAuth } from "../context/AuthContext";
 import { useSummary } from "../hooks/useSummary";
 import type { Transaction } from "../types";
 
@@ -111,6 +112,7 @@ const buildChartData = (months: { month: string; income: number; expenses: numbe
   months.map((item) => ({ month: item.month, Income: item.income, Expense: item.expenses }));
 
 const DashboardPage = (): JSX.Element => {
+  const { user } = useAuth();
   const { data, isLoading, error, refetch } = useSummary();
 
   const summary =
@@ -189,6 +191,11 @@ const DashboardPage = (): JSX.Element => {
             <p className="text-sm font-semibold uppercase tracking-[0.3em] text-indigo-500">Analytics dashboard</p>
             <h2 className="mt-3 text-3xl font-semibold text-slate-900">Your financial snapshot</h2>
             <p className="mt-2 max-w-2xl text-sm text-slate-500">Stay on top of your cash flow, categories, and latest transactions in one modern view.</p>
+            {user?.role === "ADMIN" ? (
+              <div className="mt-4 rounded-3xl bg-indigo-50 px-4 py-3 text-sm font-semibold text-indigo-700 shadow-sm">
+                You are signed in as an administrator. Use the admin navigation to manage users and categories.
+              </div>
+            ) : null}
           </div>
           <div className="inline-flex items-center gap-3 rounded-3xl bg-indigo-50 px-5 py-4 text-sm font-semibold text-indigo-700 shadow-sm">
             <span className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-indigo-500 text-white">💡</span>

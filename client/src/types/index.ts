@@ -10,6 +10,44 @@ export interface Category {
   name: string;
   color: string;
   icon: string;
+  _count?: {
+    transactions: number;
+  };
+}
+
+export interface AdminUser {
+  id: number;
+  name: string;
+  email: string;
+  role: string;
+  createdAt: string;
+  _count: {
+    transactions: number;
+  };
+}
+
+export interface AdminDashboardSummary {
+  totalUsers: number;
+  totalCategories: number;
+  totalTransactions: number;
+  totalIncome: number;
+  totalExpenses: number;
+  usersByRole: {
+    role: string;
+    count: number;
+  }[];
+  transactionsByType: {
+    type: string;
+    count: number;
+    totalAmount: number;
+  }[];
+  recentUsers: {
+    id: number;
+    name: string;
+    email: string;
+    role: string;
+    createdAt: string;
+  }[];
 }
 
 export interface CategoryBreakdown {
