@@ -6,6 +6,8 @@ import RegisterPage from "./pages/RegisterPage";
 import DashboardPage from "./pages/DashboardPage";
 import TransactionsPage from "./pages/TransactionsPage";
 import CategoriesPage from "./pages/CategoriesPage";
+import BudgetPage from "./pages/BudgetPage";
+import ReportsPage from "./pages/ReportsPage";
 
 function App(): JSX.Element {
   return (
@@ -35,6 +37,22 @@ function App(): JSX.Element {
           element={
             <AppLayout allowedRoles={["admin"]}>
               <CategoriesPage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/budget"
+          element={
+            <AppLayout>
+              <BudgetPage />
+            </AppLayout>
+          }
+        />
+        <Route
+          path="/reports"
+          element={
+            <AppLayout>
+              <ReportsPage />
             </AppLayout>
           }
         />

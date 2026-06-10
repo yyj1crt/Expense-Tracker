@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { CalendarDays, Edit3, Plus, Search, Trash2 } from "lucide-react";
 import api from "../services/api";
 import { useCategories } from "../hooks/useCategories";
 import { useTransactions } from "../hooks/useTransactions";
@@ -110,25 +111,26 @@ const TransactionsPage = (): JSX.Element => {
 
   return (
     <div className="space-y-8">
-      <div className="rounded-[32px] bg-white p-6 shadow-soft">
+      <div className="rounded-[32px] bg-slate-950 p-8 text-white shadow-soft">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <p className="text-sm uppercase tracking-[0.3em] text-indigo-500">Transactions</p>
-            <h1 className="mt-3 text-3xl font-semibold text-slate-900">Manage your cash flow</h1>
-            <p className="mt-2 max-w-2xl text-sm text-slate-500">Filter, sort, and update transactions with live controls and a polished table experience.</p>
+            <p className="text-sm uppercase tracking-[0.3em] text-cyan-300">Transactions</p>
+            <h1 className="mt-3 text-3xl font-semibold">Manage your cash flow</h1>
+            <p className="mt-2 max-w-2xl text-sm text-slate-300">Track, filter, and update entries with a premium workspace layout.</p>
           </div>
           <button
             type="button"
             onClick={openAddModal}
-            className="inline-flex items-center justify-center rounded-3xl bg-indigo-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-500 focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            className="inline-flex items-center justify-center gap-2 rounded-3xl bg-cyan-500 px-5 py-3 text-sm font-semibold text-slate-950 transition hover:bg-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-300"
           >
-            Add Transaction
+            <Plus className="h-4 w-4" />
+            Add transaction
           </button>
         </div>
       </div>
 
       <div className="rounded-[32px] bg-white p-6 shadow-soft">
-        <div className="grid gap-4 xl:grid-cols-[1fr_auto]">
+        <div className="grid gap-5 xl:grid-cols-[1fr_auto]">
           <div className="grid gap-4 lg:grid-cols-2">
             <div className="flex flex-wrap gap-2">
               {(["ALL", "INCOME", "EXPENSE"] as const).map((option) => (
@@ -167,14 +169,17 @@ const TransactionsPage = (): JSX.Element => {
 
               <label className="block text-sm font-medium text-slate-700" htmlFor="searchFilter">
                 Search title
-                <input
-                  id="searchFilter"
-                  type="search"
-                  value={searchInput}
-                  onChange={(event) => setSearchInput(event.target.value)}
-                  placeholder="Search transactions"
-                  className="mt-2 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
-                />
+                <div className="relative mt-2">
+                  <Search className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                  <input
+                    id="searchFilter"
+                    type="search"
+                    value={searchInput}
+                    onChange={(event) => setSearchInput(event.target.value)}
+                    placeholder="Search transactions"
+                    className="w-full rounded-3xl border border-slate-200 bg-white px-12 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
+                  />
+                </div>
               </label>
             </div>
           </div>
@@ -182,23 +187,29 @@ const TransactionsPage = (): JSX.Element => {
           <div className="grid gap-3 sm:grid-cols-2">
             <label className="block text-sm font-medium text-slate-700" htmlFor="startDate">
               Start date
-              <input
-                id="startDate"
-                type="date"
-                value={filters.startDate}
-                onChange={(event) => setFilterStartDate(event.target.value)}
-                className="mt-2 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
-              />
+              <div className="relative mt-2">
+                <CalendarDays className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="startDate"
+                  type="date"
+                  value={filters.startDate}
+                  onChange={(event) => setFilterStartDate(event.target.value)}
+                  className="w-full rounded-3xl border border-slate-200 bg-white px-12 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
+                />
+              </div>
             </label>
             <label className="block text-sm font-medium text-slate-700" htmlFor="endDate">
               End date
-              <input
-                id="endDate"
-                type="date"
-                value={filters.endDate}
-                onChange={(event) => setFilterEndDate(event.target.value)}
-                className="mt-2 w-full rounded-3xl border border-slate-200 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
-              />
+              <div className="relative mt-2">
+                <CalendarDays className="pointer-events-none absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-slate-400" />
+                <input
+                  id="endDate"
+                  type="date"
+                  value={filters.endDate}
+                  onChange={(event) => setFilterEndDate(event.target.value)}
+                  className="w-full rounded-3xl border border-slate-200 bg-white px-12 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
+                />
+              </div>
             </label>
           </div>
         </div>
@@ -278,7 +289,7 @@ const TransactionsPage = (): JSX.Element => {
                 </thead>
                 <tbody className="divide-y divide-slate-200 bg-white text-slate-700">
                   {transactions.map((transaction) => (
-                    <tr key={transaction.id}>
+                    <tr key={transaction.id} className="hover:bg-slate-50 transition-colors duration-150">
                       <td className="whitespace-nowrap px-6 py-4 font-medium text-slate-900">{transaction.date}</td>
                       <td className="px-6 py-4">{transaction.title}</td>
                       <td className="px-6 py-4">
@@ -305,15 +316,17 @@ const TransactionsPage = (): JSX.Element => {
                           <button
                             type="button"
                             onClick={() => openEditModal(transaction)}
-                            className="rounded-3xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
+                            className="inline-flex items-center gap-2 rounded-3xl bg-slate-100 px-4 py-2 text-xs font-semibold text-slate-700 transition hover:bg-slate-200"
                           >
+                            <Edit3 className="h-3.5 w-3.5" />
                             Edit
                           </button>
                           <button
                             type="button"
                             onClick={() => setDeleteTarget(transaction)}
-                            className="rounded-3xl bg-rose-100 px-4 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-200"
+                            className="inline-flex items-center gap-2 rounded-3xl bg-rose-100 px-4 py-2 text-xs font-semibold text-rose-700 transition hover:bg-rose-200"
                           >
+                            <Trash2 className="h-3.5 w-3.5" />
                             Delete
                           </button>
                         </div>
@@ -389,6 +402,10 @@ const TransactionsPage = (): JSX.Element => {
           </div>
         </div>
       )}
+
+      {toasts.map((toast) => (
+        <Toast key={toast.id} id={toast.id} variant={toast.variant} message={toast.message} onDismiss={() => removeToast(toast.id)} />
+      ))}
     </div>
   );
 };

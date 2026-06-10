@@ -80,7 +80,12 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
       return res.status(401).json({ error: "User not authenticated" });
     }
 
-    return res.json({ data: req.user });
+    const user = await prisma.user.findUnique({ where: { id: req.user.id } });
+    if (!user) {
+      return res.status(401).json({ error: "User not authenticated" });
+    }
+
+    return res.json({ data: sanitiseUser(user) });
   } catch (error) {
     next(error);
   }

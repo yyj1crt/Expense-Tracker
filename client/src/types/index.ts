@@ -43,6 +43,7 @@ export interface TransactionSummary {
   byCategory: CategoryBreakdown[];
   monthlyTotals: MonthlyTotal[];
   recentTransactions?: Transaction[];
+  transactionsThisMonth?: number;
 }
 
 export interface ApiResponse<T> {

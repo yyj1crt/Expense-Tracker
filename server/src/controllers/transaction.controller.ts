@@ -105,6 +105,8 @@ export const getTransactionById = async (req: AuthRequest, res: Response, next: 
 
 export const createTransaction = async (req: AuthRequest, res: Response, next: NextFunction) => {
   try {
+    console.log('Create transaction request body:', req.body);
+    console.log('User ID:', req.user?.id);
     const userId = req.user?.id;
     if (!userId) {
       return res.status(401).json({ error: "User not authenticated" });
@@ -139,6 +141,7 @@ export const createTransaction = async (req: AuthRequest, res: Response, next: N
 
     return res.status(201).json({ data: transaction });
   } catch (error) {
+    console.error('Create transaction error:', error);
     next(error);
   }
 };
@@ -240,6 +243,19 @@ export const getSummary = async (req: AuthRequest, res: Response, next: NextFunc
     const totalExpenses = transactions.filter((t) => t.type === "EXPENSE").reduce((sum, tx) => sum + tx.amount, 0);
     const balance = totalIncome - totalExpenses;
 
+    const now = new Date();
+    const currentMonthTransactions = transactions.filter((tx) => {
+      const txDate = new Date(tx.date);
+      return txDate.getFullYear() === now.getFullYear() && txDate.getMonth() === now.getMonth();
+    });
+
+    const recentTransactions = currentMonthTransactions
+      .slice()
+      .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+      .slice(0, 5);
+
+    const totalTransactionsThisMonth = currentMonthTransactions.length;
+
     const breakdown = transactions.reduce<Record<string, { categoryId: number; category: { id: number; name: string; color: string }; amount: number; percentage?: number }>>((acc, tx) => {
       const key = tx.category.name;
       if (!acc[key]) {
@@ -277,6 +293,8 @@ export const getSummary = async (req: AuthRequest, res: Response, next: NextFunc
         balance,
         byCategory,
         monthlyTotals,
+        recentTransactions,
+        transactionsThisMonth: totalTransactionsThisMonth,
       },
     });
   } catch (error) {
