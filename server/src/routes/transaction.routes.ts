@@ -123,8 +123,6 @@ const transactionValidation = [
  *       201:
  *         description: Transaction created
  */
-router.post("/", verifyToken, transactionValidation, createTransaction);
-
 /**
  * @openapi
  * /api/transactions/{id}:
@@ -142,6 +140,8 @@ router.post("/", verifyToken, transactionValidation, createTransaction);
  *       200:
  *         description: Transaction details
  */
+router.post("/", verifyToken, transactionValidation, createTransaction);
+
 router.get(
   "/:id",
   verifyToken,

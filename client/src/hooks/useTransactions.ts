@@ -66,13 +66,21 @@ export const useTransactions = (pageSize = 10) => {
       params.append("order", sortOrder);
 
       const response = await api.get<ApiResponse<TransactionPageResponse>>(
-        `/transactions?${params.toString()}`
+        `/api/transactions?${params.toString()}`
       );
 
-      setTransactions(response.data.data.items ?? []);
-      setTotal(response.data.data.total ?? response.data.data.items.length);
+      const data = response.data.data as any;
+      const transactionData: Transaction[] = data.transactions ?? data.items ?? [];
+      setTransactions(transactionData);
+      setTotal(
+        typeof data.total === "number"
+          ? data.total
+          : transactionData.length
+      );
     } catch (err) {
-      setError(err instanceof Error ? err.message : "Unable to load transactions.");
+      const message = err instanceof Error ? err.message : "Unable to load transactions.";
+      console.error("Failed to fetch transactions:", err);
+      setError(message);
     } finally {
       setIsLoading(false);
     }

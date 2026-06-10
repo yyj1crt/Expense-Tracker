@@ -55,7 +55,8 @@ export interface ApiResponse<T> {
 export interface AuthContextType {
   user: User | null;
   token: string | null;
-  login: (token: string, userData?: User) => Promise<void>;
+  login: (email: string, password: string) => Promise<string | null>;
+  register: (name: string, email: string, password: string) => Promise<string | null>;
   logout: () => void;
   isAuthenticated: boolean;
   isLoading: boolean;

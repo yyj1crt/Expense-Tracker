@@ -238,8 +238,8 @@ const TransactionsPage = (): JSX.Element => {
           <div className="grid gap-6 rounded-[32px] border border-dashed border-slate-300 bg-slate-50 p-12 text-center text-slate-600">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-slate-100 text-3xl">📄</div>
             <div>
-              <h2 className="text-xl font-semibold text-slate-900">No transactions found</h2>
-              <p className="mt-2 text-sm text-slate-500">Try broadening your date range or clearing filters to see more transactions.</p>
+              <h2 className="text-xl font-semibold text-slate-900">No transactions yet</h2>
+              <p className="mt-2 text-sm text-slate-500">Add your first transaction or clear filters to refresh the list.</p>
             </div>
           </div>
         ) : (
@@ -389,6 +389,8 @@ const TransactionsPage = (): JSX.Element => {
           </div>
         </div>
       )}
-
+    </div>
+  );
+};
 
 export default TransactionsPage;

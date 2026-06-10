@@ -3,9 +3,9 @@ import { NavLink } from "react-router-dom";
 import { useAuth } from "../../context/AuthContext";
 
 const navItems = [
-  { href: "/dashboard", label: "Dashboard", roles: ["user", "admin"] },
-  { href: "/transactions", label: "Transactions", roles: ["user", "admin"] },
-  { href: "/categories", label: "Categories", roles: ["admin"] },
+  { href: "/dashboard", label: "Dashboard", key: "dashboard" },
+  { href: "/transactions", label: "Transactions", key: "transactions" },
+  { href: "/categories", label: "Categories", key: "categories", adminOnly: true },
 ];
 
 const Sidebar = (): JSX.Element => {
@@ -28,7 +28,7 @@ const Sidebar = (): JSX.Element => {
 
         <nav aria-label="Primary" className="space-y-2">
           {navItems
-            .filter((item) => item.roles.includes(role))
+            .filter((item) => (item.adminOnly ? user?.role === "ADMIN" : true))
             .map((item) => (
               <NavLink
                 key={item.href}
@@ -37,13 +37,31 @@ const Sidebar = (): JSX.Element => {
                   `flex items-center gap-3 rounded-3xl px-5 py-3 text-sm font-medium transition duration-200 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:ring-offset-2 focus:ring-offset-[#1e1e2e] ${
                     isActive
                       ? "bg-indigo-500/15 text-white shadow-lg shadow-indigo-500/10"
-                      : "text-slate-300 hover:text-white hover:bg-white/5"
+                      : "text-slate-100 hover:text-white hover:bg-white/5"
                   }`
                 }
                 aria-current={({ isActive }) => (isActive ? "page" : undefined)}
               >
-                <span className="h-2.5 w-2.5 rounded-full bg-indigo-400" />
-                {item.label}
+                {/* inline icons for clarity on dark background */}
+                <span className="flex h-6 w-6 items-center justify-center rounded-full bg-indigo-600/10 text-indigo-300">
+                  {item.key === "dashboard" && (
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M3 13h8V3H3v10zM13 21h8v-8h-8v8zM13 3v6h8V3h-8zM3 21h8v-6H3v6z" fill="currentColor" />
+                    </svg>
+                  )}
+                  {item.key === "transactions" && (
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M12 2v20M5 7h14M5 17h14" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                  {item.key === "categories" && (
+                    <svg className="h-4 w-4" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                      <path d="M4 7h16M4 12h16M4 17h16" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+                    </svg>
+                  )}
+                </span>
+
+                <span className="truncate">{item.label}</span>
               </NavLink>
             ))}
         </nav>

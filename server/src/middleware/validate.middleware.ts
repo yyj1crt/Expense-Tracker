@@ -7,10 +7,13 @@ export const validateRequest = (req: Request, res: Response, next: NextFunction)
   const errors = validationResult(req);
   if (!errors.isEmpty()) {
     return res.status(422).json({
-      errors: errors.array().map((error) => ({
-        field: error.param,
-        message: error.msg,
-      })),
+      errors: errors.array().map((error) => {
+        const field = (error as any).param || (error as any).location || "unknown";
+        return {
+          field,
+          message: error.msg,
+        };
+      }),
     });
   }
   next();

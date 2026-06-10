@@ -15,7 +15,7 @@ export const getAllCategories = async (_req: Request, res: Response, next: NextF
         },
       },
     });
-    return res.json({ categories });
+    return res.json({ data: categories });
   } catch (error) {
     next(error);
   }
@@ -34,7 +34,7 @@ export const createCategory = async (req: AuthRequest, res: Response, next: Next
       data: { name, color, icon },
     });
 
-    return res.status(201).json({ category });
+    return res.status(201).json({ data: category });
   } catch (error) {
     next(error);
   }
@@ -60,7 +60,7 @@ export const updateCategory = async (req: AuthRequest, res: Response, next: Next
       data: { name, color, icon },
     });
 
-    return res.json({ category: updated });
+    return res.json({ data: updated });
   } catch (error) {
     next(error);
   }

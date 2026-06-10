@@ -13,10 +13,13 @@ export const errorHandler = (
   const message = typeof err === "object" && err !== null && "message" in err && typeof (err as { message?: string }).message === "string"
     ? (err as { message: string }).message
     : "Internal Server Error";
+  const stack = typeof err === "object" && err !== null && "stack" in err && typeof (err as { stack?: string }).stack === "string"
+    ? (err as { stack: string }).stack
+    : undefined;
   logger.error("Error handled: %s", message, { error: err });
   res.status(status).json({
     status: "error",
     message,
-    ...(process.env.NODE_ENV !== "production" && { details: err?.stack }),
+    ...(process.env.NODE_ENV !== "production" && stack ? { details: stack } : {}),
   });
 };

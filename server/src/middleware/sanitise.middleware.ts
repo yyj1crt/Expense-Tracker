@@ -28,7 +28,7 @@ const sanitiseObject = (input: Record<string, unknown>): Record<string, unknown>
 
 export const sanitiseRequest = (req: Request, _res: Response, next: NextFunction) => {
   req.body = sanitiseObject(req.body || {});
-  req.params = sanitiseObject(req.params || {});
-  req.query = sanitiseObject(req.query || {});
+  req.params = sanitiseObject(req.params || {}) as any;
+  req.query = sanitiseObject(req.query || {}) as any;
   next();
 };

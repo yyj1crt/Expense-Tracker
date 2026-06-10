@@ -8,10 +8,15 @@ import type { Category, Transaction } from "../types";
 
 export const transactionSchema = z.object({
   title: z.string().min(1, "Title is required."),
-  amount: z.number({ invalid_type_error: "Amount must be a number." }).positive("Amount must be positive."),
+  amount: z
+    .string()
+    .min(1, "Amount must be a positive number")
+    .refine((val) => !isNaN(Number(val)) && Number(val) > 0, {
+      message: "Amount must be a positive number",
+    }),
   type: z.enum(["INCOME", "EXPENSE"]),
   categoryId: z.string().min(1, "Category is required."),
-  date: z.string().min(1, "Date is required."),
+  date: z.string().min(1, "Date is required"),
   note: z.string().optional(),
 });
 
@@ -38,10 +43,10 @@ const TransactionModal = ({ categories, isLoadingCategories, transaction, onClos
     resolver: zodResolver(transactionSchema),
     defaultValues: {
       title: transaction?.title ?? "",
-      amount: transaction?.amount ?? 0,
+      amount: transaction?.amount?.toString() ?? "",
       type: transaction?.type ?? "EXPENSE",
       categoryId: transaction?.category.id.toString() ?? "",
-      date: transaction?.date ?? "",
+      date: transaction?.date?.split("T")[0]?.split("T")[0] ?? new Date().toISOString().split("T")[0],
       note: transaction?.note ?? "",
     },
   });
@@ -49,10 +54,10 @@ const TransactionModal = ({ categories, isLoadingCategories, transaction, onClos
   useEffect(() => {
     reset({
       title: transaction?.title ?? "",
-      amount: transaction?.amount ?? 0,
+      amount: transaction?.amount?.toString() ?? "",
       type: transaction?.type ?? "EXPENSE",
       categoryId: transaction?.category.id.toString() ?? "",
-      date: transaction?.date ?? "",
+      date: transaction?.date ? new Date(transaction.date).toISOString().split("T")[0] : new Date().toISOString().split("T")[0],
       note: transaction?.note ?? "",
     });
   }, [transaction, reset]);
@@ -63,21 +68,22 @@ const TransactionModal = ({ categories, isLoadingCategories, transaction, onClos
     try {
       const payload = {
         title: values.title,
-        amount: values.amount,
+        amount: Number(values.amount),
         type: values.type,
         categoryId: Number(values.categoryId),
-        date: values.date,
-        note: values.note,
+        date: new Date(values.date).toISOString(),
+        note: values.note || "",
       };
 
       if (transaction) {
-        await api.put(`/transactions/${transaction.id}`, payload);
+        await api.put(`/api/transactions/${transaction.id}`, payload);
         onSuccess("Transaction updated successfully.");
       } else {
-        await api.post("/transactions", payload);
+        await api.post("/api/transactions", payload);
         onSuccess("Transaction created successfully.");
       }
     } catch (err) {
+      console.log("Transaction save error:", err);
       onError(err instanceof Error ? err.message : "Unable to save transaction.");
     }
   };
@@ -124,7 +130,7 @@ const TransactionModal = ({ categories, isLoadingCategories, transaction, onClos
                 id="amount"
                 type="number"
                 step="0.01"
-                {...register("amount", { valueAsNumber: true })}
+                {...register("amount")}
                 className="mt-2 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
               />
             </label>
@@ -164,11 +170,17 @@ const TransactionModal = ({ categories, isLoadingCategories, transaction, onClos
                 className="mt-2 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
               >
                 <option value="">Choose a category</option>
-                {categories.map((category) => (
-                  <option key={category.id} value={category.id}>
-                    {category.name}
+                {(isLoadingCategories || categories.length === 0) ? (
+                  <option value="" disabled>
+                    Loading categories...
                   </option>
-                ))}
+                ) : (
+                  categories.map((category) => (
+                    <option key={category.id} value={category.id}>
+                      {category.icon} {category.name}
+                    </option>
+                  ))
+                )}
               </select>
             </label>
           </div>
@@ -180,6 +192,7 @@ const TransactionModal = ({ categories, isLoadingCategories, transaction, onClos
               <input
                 id="date"
                 type="date"
+                defaultValue={new Date().toISOString().split("T")[0]}
                 {...register("date")}
                 className="mt-2 w-full rounded-3xl border border-slate-200 bg-slate-50 px-4 py-3 text-slate-900 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
               />

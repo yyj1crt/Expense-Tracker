@@ -12,7 +12,7 @@ async function main() {
     { name: "Salary", color: "#10b981", icon: "💰" },
   ];
 
-  await prisma.category.createMany({ data: categories, skipDuplicates: true });
+  await prisma.category.createMany({ data: categories });
 
   const hashedPassword = await bcrypt.hash("Demo1234!", 10);
 
@@ -123,7 +123,7 @@ async function main() {
     },
   ];
 
-  await prisma.transaction.createMany({ data: transactions, skipDuplicates: true });
+  await prisma.transaction.createMany({ data: transactions });
 
   console.log("Seed data created successfully.");
 }

@@ -143,14 +143,25 @@ const getStatusText = (balance: number) => {
 const DashboardPage = (): JSX.Element => {
   const { data, isLoading, error, refetch } = useSummary();
 
-  const totals = data?.monthlyTotals ?? [];
-  const donutData = data?.byCategory.map((item) => ({
+  const summary =
+    data ??
+    ({
+      totalIncome: 0,
+      totalExpenses: 0,
+      balance: 0,
+      byCategory: [],
+      monthlyTotals: [],
+      recentTransactions: [],
+    } as const);
+
+  const totals = summary.monthlyTotals ?? [];
+  const donutData = summary.byCategory.map((item) => ({
     name: item.category.name,
     value: item.amount,
     color: item.category.color,
     percentage: item.percentage,
-  })) ?? [];
-  const recentTransactions = data?.recentTransactions ?? [];
+  }));
+  const recentTransactions = summary.recentTransactions ?? [];
 
   if (isLoading) {
     return (

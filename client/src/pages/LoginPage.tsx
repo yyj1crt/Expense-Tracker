@@ -3,9 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../services/api";
 import { useAuth } from "../context/AuthContext";
-import type { ApiResponse, User } from "../types";
 
 const loginSchema = z.object({
   email: z.string().email("Please enter a valid email address"),
@@ -17,7 +15,8 @@ type LoginFormValues = z.infer<typeof loginSchema>;
 // feat: login page with validation and secure error messaging
 const LoginPage = (): JSX.Element => {
   const [serverError, setServerError] = useState<string | null>(null);
-  const { login } = useAuth();
+  const [isLoading, setIsLoading] = useState(false);
+  const { login: loginUser } = useAuth();
   const navigate = useNavigate();
 
   const {
@@ -26,24 +25,26 @@ const LoginPage = (): JSX.Element => {
     formState: { errors, isSubmitting },
   } = useForm<LoginFormValues>({
     resolver: zodResolver(loginSchema),
-    mode: "onTouched",
+    mode: "onBlur",
   });
 
   const onSubmit = async (values: LoginFormValues): Promise<void> => {
     setServerError(null);
+    setIsLoading(true);
 
     try {
-      const response = await api.post<ApiResponse<{ token: string; user: User }>>("/auth/login", values);
-      const result = response.data.data;
-
-      if (!result?.token) {
-        throw new Error("Unable to sign in. Please try again.");
+      const errorMessage = await loginUser(values.email, values.password);
+      if (errorMessage) {
+        setServerError(errorMessage);
+        return;
       }
 
-      await login(result.token, result.user);
       navigate("/dashboard", { replace: true });
-    } catch (error) {
-      setServerError("Email or password is invalid. Please check your credentials.");
+    } catch (error: any) {
+      console.error("Login error:", error);
+      setServerError("Unable to sign in. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -87,10 +88,10 @@ const LoginPage = (): JSX.Element => {
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isSubmitting || isLoading}
             className="inline-flex w-full items-center justify-center gap-3 rounded-3xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? (
+            {isLoading ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
                 Signing in...

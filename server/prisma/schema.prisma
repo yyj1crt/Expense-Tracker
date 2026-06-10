@@ -7,22 +7,12 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-enum Role {
-  USER
-  ADMIN
-}
-
-enum TransactionType {
-  INCOME
-  EXPENSE
-}
-
 model User {
   id           Int           @id @default(autoincrement())
   email        String        @unique
   password     String
   name         String
-  role         Role          @default(USER)
+  role         String        @default("USER")
   transactions Transaction[]
   createdAt    DateTime      @default(now())
 }
@@ -39,7 +29,7 @@ model Transaction {
   id         Int             @id @default(autoincrement())
   title      String
   amount     Float
-  type       TransactionType
+  type       String
   date       DateTime
   note       String?
   user       User            @relation(fields: [userId], references: [id])

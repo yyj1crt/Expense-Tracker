@@ -18,7 +18,7 @@ export const useSummary = (): {
     setError(null);
 
     try {
-      const response = await api.get<ApiResponse<TransactionSummary>>("/transactions/summary");
+      const response = await api.get<ApiResponse<TransactionSummary>>("/api/transactions/summary");
       setData(response.data.data);
     } catch (err) {
       const message = err instanceof Error ? err.message : "Unable to load summary.";

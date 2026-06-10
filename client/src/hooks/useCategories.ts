@@ -20,7 +20,7 @@ export const useCategories = () => {
     setError(null);
 
     try {
-      const response = await api.get<{ data: Category[] }>("/categories");
+      const response = await api.get<{ data: Category[] }>("/api/categories");
       cachedCategories = response.data.data;
       setCategories(cachedCategories);
     } catch (err) {

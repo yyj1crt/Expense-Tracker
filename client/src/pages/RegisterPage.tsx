@@ -3,7 +3,7 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { z } from "zod";
 import { Link, useNavigate } from "react-router-dom";
-import api from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
 const registerSchema = z
   .object({
@@ -26,32 +26,38 @@ type RegisterFormValues = z.infer<typeof registerSchema>;
 const RegisterPage = (): JSX.Element => {
   const [successMessage, setSuccessMessage] = useState<string | null>(null);
   const [serverError, setServerError] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const { register: registerUser } = useAuth();
   const navigate = useNavigate();
 
   const {
-    register,
+    register: registerForm,
     handleSubmit,
-    formState: { errors, isSubmitting },
+    formState: { errors },
   } = useForm<RegisterFormValues>({
     resolver: zodResolver(registerSchema),
-    mode: "onTouched",
+    mode: "onBlur",
   });
 
   const onSubmit = async (values: RegisterFormValues): Promise<void> => {
     setServerError(null);
     setSuccessMessage(null);
+    setIsLoading(true);
 
     try {
-      await api.post("/auth/register", {
-        name: values.name,
-        email: values.email,
-        password: values.password,
-      });
+      const errorMessage = await registerUser(values.name, values.email, values.password);
+      if (errorMessage) {
+        setServerError(errorMessage);
+        return;
+      }
 
       setSuccessMessage("Registration successful. Redirecting to login...");
-      window.setTimeout(() => navigate("/login", { replace: true }), 1600);
-    } catch {
+      setTimeout(() => navigate("/login", { replace: true }), 1400);
+    } catch (error: any) {
+      console.error("Registration error:", error);
       setServerError("Unable to create your account. Please try again.");
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -71,7 +77,7 @@ const RegisterPage = (): JSX.Element => {
               id="name"
               type="text"
               autoComplete="name"
-              {...register("name")}
+              {...registerForm("name")}
               aria-invalid={errors.name ? "true" : "false"}
               className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
             />
@@ -84,7 +90,7 @@ const RegisterPage = (): JSX.Element => {
               id="email"
               type="email"
               autoComplete="email"
-              {...register("email")}
+              {...registerForm("email")}
               aria-invalid={errors.email ? "true" : "false"}
               className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
             />
@@ -97,7 +103,7 @@ const RegisterPage = (): JSX.Element => {
               id="password"
               type="password"
               autoComplete="new-password"
-              {...register("password")}
+              {...registerForm("password")}
               aria-invalid={errors.password ? "true" : "false"}
               className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
             />
@@ -110,22 +116,26 @@ const RegisterPage = (): JSX.Element => {
               id="confirmPassword"
               type="password"
               autoComplete="new-password"
-              {...register("confirmPassword")}
+              {...registerForm("confirmPassword")}
               aria-invalid={errors.confirmPassword ? "true" : "false"}
               className="mt-3 w-full rounded-3xl border border-slate-700 bg-slate-900 px-4 py-3 text-slate-100 outline-none transition focus:border-indigo-400 focus:ring-2 focus:ring-indigo-500/20"
             />
           </label>
           {errors.confirmPassword && <p className="mt-2 text-sm text-rose-400">{errors.confirmPassword.message}</p>}
 
-          {serverError && <p className="text-center text-sm text-rose-400">{serverError}</p>}
+          {serverError && (
+            <div className="rounded-3xl bg-rose-950/80 px-4 py-3 text-sm text-rose-200 ring-1 ring-rose-500/30">
+              {serverError}
+            </div>
+          )}
           {successMessage && <p className="text-center text-sm text-emerald-300">{successMessage}</p>}
 
           <button
             type="submit"
-            disabled={isSubmitting}
+            disabled={isLoading}
             className="inline-flex w-full items-center justify-center gap-3 rounded-3xl bg-indigo-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-indigo-400 disabled:cursor-not-allowed disabled:opacity-70"
           >
-            {isSubmitting ? (
+            {isLoading ? (
               <>
                 <span className="h-4 w-4 animate-spin rounded-full border-2 border-white/20 border-t-white" />
                 Creating account...

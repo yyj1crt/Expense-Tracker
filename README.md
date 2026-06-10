@@ -13,7 +13,6 @@ This project allows users to register, log in, and manage income and expense tra
 ## Prerequisites
 
 - Node.js 18 or newer
-- PostgreSQL
 - Git
 
 ## Setup
@@ -26,7 +25,7 @@ npm install
 cp .env.example .env
 ```
 
-Update `server/.env` with your PostgreSQL credentials and a strong JWT secret.
+Update `server/.env` with a strong JWT secret. This project now uses a local SQLite database by default (`file:./dev.db`).
 
 Run Prisma migrations and seed data:
 
@@ -139,7 +138,7 @@ expense-tracker-website/
 | Layer | Technology |
 | --- | --- |
 | Frontend | React, TypeScript, Vite, Tailwind CSS |
-| Backend | Node.js, Express, TypeScript, Prisma, PostgreSQL |
+| Backend | Node.js, Express, TypeScript, Prisma, SQLite |
 | Auth | JWT, bcrypt |
 | Testing | Jest, Vitest, React Testing Library, Playwright |
 | Docs | Swagger UI |

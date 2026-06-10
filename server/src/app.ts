@@ -1,16 +1,14 @@
 // feat: configure secure HTTP middleware and API routing
+import "dotenv/config";
 import express, { type RequestHandler } from "express";
 import cors from "cors";
 import helmet from "helmet";
 import rateLimit from "express-rate-limit";
 import swaggerJsdoc from "swagger-jsdoc";
 import swaggerUi from "swagger-ui-express";
-import dotenv from "dotenv";
 import apiRouter from "./routes/api";
 import { errorHandler } from "./middleware/errorHandler";
 import { sanitiseRequest } from "./middleware/sanitise.middleware";
-
-dotenv.config();
 
 const app = express();
 
@@ -82,11 +80,17 @@ app.use(
 const helmetModule = helmet as unknown as { xssFilter?: () => RequestHandler };
 app.use(helmetModule.xssFilter ? helmetModule.xssFilter() : (_req, _res, next) => next());
 
-// CORS is locked to the frontend origin and only allows safe headers and methods.
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:5174",
+  process.env.FRONTEND_URL || "",
+].filter(Boolean);
+
 app.use(
   cors({
-    origin: FRONTEND_URL,
-    methods: ["GET", "POST", "PUT", "DELETE"],
+    origin: allowedOrigins,
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
   })
 );

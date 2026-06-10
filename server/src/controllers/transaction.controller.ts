@@ -28,10 +28,11 @@ export const getAllTransactions = async (req: AuthRequest, res: Response, next: 
       limit = "20",
     } = req.query as Record<string, string>;
 
-    const where: Prisma.TransactionWhereInput = { userId };
+    const where: Prisma.TransactionWhereInput = { userId: req.user!.id };
+    let dateFilter: Prisma.DateTimeFilter | undefined;
 
     if (type && ["INCOME", "EXPENSE"].includes(type)) {
-      where.type = type;
+      where.type = type as any;
     }
     if (categoryId) {
       const categoryIdNumber = Number(categoryId);
@@ -42,14 +43,17 @@ export const getAllTransactions = async (req: AuthRequest, res: Response, next: 
     if (startDate) {
       const start = new Date(startDate);
       if (!Number.isNaN(start.getTime())) {
-        where.date = { ...where.date, gte: start };
+        dateFilter = { ...dateFilter, gte: start };
       }
     }
     if (endDate) {
       const end = new Date(endDate);
       if (!Number.isNaN(end.getTime())) {
-        where.date = { ...where.date, lte: end };
+        dateFilter = { ...dateFilter, lte: end };
       }
+    }
+    if (dateFilter) {
+      where.date = dateFilter;
     }
 
     const pageNumber = Math.max(Number(page) || 1, 1);
@@ -68,13 +72,12 @@ export const getAllTransactions = async (req: AuthRequest, res: Response, next: 
     ]);
 
     return res.json({
-      meta: {
+      data: {
+        transactions,
         total,
         page: pageNumber,
         limit: limitNumber,
-        pages: Math.ceil(total / limitNumber),
       },
-      transactions,
     });
   } catch (error) {
     next(error);
@@ -94,7 +97,7 @@ export const getTransactionById = async (req: AuthRequest, res: Response, next: 
       // Prevent broken access control by ensuring the authenticated user is the owner of the transaction.
       return res.status(404).json({ error: "Transaction not found" });
     }
-    return res.json({ transaction });
+    return res.json({ data: transaction });
   } catch (error) {
     next(error);
   }
@@ -134,7 +137,7 @@ export const createTransaction = async (req: AuthRequest, res: Response, next: N
       include: { category: true },
     });
 
-    return res.status(201).json({ transaction });
+    return res.status(201).json({ data: transaction });
   } catch (error) {
     next(error);
   }
@@ -177,7 +180,7 @@ export const updateTransaction = async (req: AuthRequest, res: Response, next: N
       include: { category: true },
     });
 
-    return res.json({ transaction: updated });
+    return res.json({ data: updated });
   } catch (error) {
     next(error);
   }
@@ -209,26 +212,49 @@ export const getSummary = async (req: AuthRequest, res: Response, next: NextFunc
     }
 
     const { start, end } = getDateRange();
+
+    // Ensure we explicitly filter by the authenticated user's id
+    const userIdFilter = req.user?.id;
     const transactions = await prisma.transaction.findMany({
       where: {
-        userId,
+        userId: userIdFilter,
         date: { gte: start, lte: end },
       },
       include: { category: true },
     });
 
+    // Default values when there are no transactions
+    if (!transactions || transactions.length === 0) {
+      return res.json({
+        data: {
+          totalIncome: 0,
+          totalExpenses: 0,
+          balance: 0,
+          byCategory: [],
+          monthlyTotals: [],
+        },
+      });
+    }
+
     const totalIncome = transactions.filter((t) => t.type === "INCOME").reduce((sum, tx) => sum + tx.amount, 0);
     const totalExpenses = transactions.filter((t) => t.type === "EXPENSE").reduce((sum, tx) => sum + tx.amount, 0);
     const balance = totalIncome - totalExpenses;
 
-    const breakdown = transactions.reduce<Record<string, { categoryId: number; categoryName: string; total: number }>>((acc, tx) => {
+    const breakdown = transactions.reduce<Record<string, { categoryId: number; category: { id: number; name: string; color: string }; amount: number; percentage?: number }>>((acc, tx) => {
       const key = tx.category.name;
       if (!acc[key]) {
-        acc[key] = { categoryId: tx.categoryId, categoryName: tx.category.name, total: 0 };
+        acc[key] = { categoryId: tx.categoryId, category: { id: tx.categoryId, name: tx.category.name, color: tx.category.color }, amount: 0 } as any;
       }
-      acc[key].total += tx.amount;
+      acc[key].amount += tx.amount;
       return acc;
     }, {});
+
+    // Turn breakdown into array and compute percentages
+    const byCategory = Object.values(breakdown);
+    const totalForPercentage = byCategory.reduce((s, b) => s + b.amount, 0) || 0;
+    byCategory.forEach((b) => {
+      b.percentage = totalForPercentage > 0 ? (b.amount / totalForPercentage) * 100 : 0;
+    });
 
     const monthlyTotals = Array.from({ length: 6 }).map((_, index) => {
       const date = new Date(start.getFullYear(), start.getMonth() + index, 1);
@@ -245,13 +271,17 @@ export const getSummary = async (req: AuthRequest, res: Response, next: NextFunc
     });
 
     return res.json({
-      totalIncome,
-      totalExpenses,
-      balance,
-      breakdown: Object.values(breakdown),
-      monthlyTotals,
+      data: {
+        totalIncome,
+        totalExpenses,
+        balance,
+        byCategory,
+        monthlyTotals,
+      },
     });
   } catch (error) {
-    next(error);
+    // Return explicit 500 with a clear message for debugging and client display
+    console.error("Error in getSummary:", error);
+    return res.status(500).json({ error: "Failed to compute transaction summary. Please try again later." });
   }
 };

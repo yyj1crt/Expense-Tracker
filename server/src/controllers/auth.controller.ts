@@ -37,8 +37,11 @@ export const register = async (req: AuthRequest, res: Response, next: NextFuncti
 
     const token = signToken({ id: user.id, email: user.email, role: user.role });
     return res.status(201).json({
-      token,
-      user: sanitiseUser(user),
+      data: {
+        token,
+        user: sanitiseUser(user),
+      },
+      message: "Registration successful",
     });
   } catch (error) {
     next(error);
@@ -61,8 +64,10 @@ export const login = async (req: AuthRequest, res: Response, next: NextFunction)
 
     const token = signToken({ id: user.id, email: user.email, role: user.role });
     return res.json({
-      token,
-      user: sanitiseUser(user),
+      data: {
+        token,
+        user: sanitiseUser(user),
+      },
     });
   } catch (error) {
     next(error);
@@ -75,7 +80,7 @@ export const getMe = async (req: AuthRequest, res: Response, next: NextFunction)
       return res.status(401).json({ error: "User not authenticated" });
     }
 
-    return res.json({ user: req.user });
+    return res.json({ data: req.user });
   } catch (error) {
     next(error);
   }
